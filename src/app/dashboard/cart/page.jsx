@@ -162,8 +162,22 @@ export default function CartPage() {
             </div>
 
             <button 
-              onClick={() => alert('Checkout functionality is simulated. Thank you for using BeautyVault!')}
-              className="w-full btn-primary py-4 px-6 rounded-2xl shadow-lg flex items-center justify-center gap-2 font-bold bg-gradient-to-r from-[#E91E63] to-[#C2185B]"
+              onClick={async () => {
+                try {
+                  const res = await fetch('/api/checkout_sessions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ cart })
+                  });
+                  if (!res.ok) throw new Error('Checkout failed');
+                  const { url } = await res.json();
+                  window.location.href = url;
+                } catch (err) {
+                  console.error(err);
+                  alert('Error during checkout.');
+                }
+              }}
+              className="w-full btn-primary py-4 px-6 rounded-2xl shadow-lg flex items-center justify-center gap-2 font-bold bg-gradient-to-r from-[#E91E63] to-[#C2185B] text-white"
             >
               Proceed to Secure Checkout <ArrowRight className="w-4.5 h-4.5" />
             </button>
