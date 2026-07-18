@@ -1,4 +1,9 @@
 import Banner from "@/components/Banner";
+import FeaturedBrands from "@/components/brand/FeaturedBrands";
+import WhyChooseBeautyVault from "@/components/WhyChooseBeautyVault";
+import FeaturedProducts from "@/components/products/FeaturedProducts";
+import CustomerReview from "@/components/CustomerReview";
+import Newsletter from "@/components/Newsletter";
 
 export const metadata = {
   title: "Home",
@@ -10,6 +15,11 @@ export default function Home() {
   return (
     <>
       <Banner />
+      <FeaturedBrands />
+      <WhyChooseBeautyVault />
+      <FeaturedProducts />
+      <CustomerReview />
+      <Newsletter />
     </>
   );
 }
