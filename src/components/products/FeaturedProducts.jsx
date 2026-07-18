@@ -13,7 +13,7 @@ export default function FeaturedProducts() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch('http://localhost:5000/products');
+        const res = await fetch('/api/products');
         if (!res.ok) throw new Error('Failed to fetch');
         const data = await res.json();
         // Just take the first 8 for the featured section

@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSession } from '@/lib/auth-client';
-import { Package, Search, Edit2, Trash2, Loader2, AlertCircle, Plus, Eye } from 'lucide-react';
+import { Package, Search, Edit2, Trash2, Loader2, AlertCircle, Plus, Eye, Star } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export default function MyProductsPage() {
@@ -15,6 +15,8 @@ export default function MyProductsPage() {
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [deletingId, setDeletingId] = useState(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState(null);
 
   useEffect(() => {
     if (isPending) return;
@@ -31,7 +33,7 @@ export default function MyProductsPage() {
         const res = await fetch(`/api/products?createdBy=${session.user.id}`);
         if (!res.ok) throw new Error('Failed to fetch products');
         const data = await res.json();
-        setProducts(data);
+        setProducts(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error(err);
         setError('Unable to load your products.');
@@ -43,17 +45,24 @@ export default function MyProductsPage() {
     fetchMyProducts();
   }, [session, isPending]);
 
-  const handleDelete = async (id) => {
-    if (!confirm('Are you sure you want to delete this product? This action cannot be undone.')) return;
+  const confirmDelete = (product) => {
+    setProductToDelete(product);
+    setDeleteModalOpen(true);
+  };
+
+  const executeDelete = async () => {
+    if (!productToDelete) return;
     
     try {
-      setDeletingId(id);
-      const res = await fetch(`/api/delete-product/${id}`, {
+      setDeletingId(productToDelete._id);
+      const res = await fetch(`/api/delete-product/${productToDelete._id}`, {
         method: 'DELETE',
       });
       if (!res.ok) throw new Error('Failed to delete');
       
-      setProducts(prev => prev.filter(p => p._id !== id));
+      setProducts(prev => prev.filter(p => p._id !== productToDelete._id));
+      setDeleteModalOpen(false);
+      setProductToDelete(null);
     } catch (err) {
       console.error(err);
       alert('Failed to delete product.');
@@ -205,7 +214,7 @@ export default function MyProductsPage() {
                           <Edit2 className="w-4.5 h-4.5" />
                         </Link>
                         <button
-                          onClick={() => handleDelete(product._id)}
+                          onClick={() => confirmDelete(product)}
                           disabled={deletingId === product._id}
                           className="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50"
                           title="Delete Product"
@@ -225,6 +234,37 @@ export default function MyProductsPage() {
           </table>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+          <div className="bg-white rounded-[2rem] max-w-md w-full p-8 shadow-2xl border border-red-100">
+            <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mb-6 mx-auto">
+              <AlertCircle className="w-8 h-8 text-red-500" />
+            </div>
+            <h3 className="text-xl font-bold text-center text-gray-900 mb-2">Delete Product</h3>
+            <p className="text-center text-gray-500 text-sm mb-8">
+              Are you sure you want to delete <span className="font-bold text-gray-800">{productToDelete?.title || productToDelete?.name}</span>? This action cannot be undone.
+            </p>
+            <div className="flex gap-4">
+              <button
+                onClick={() => setDeleteModalOpen(false)}
+                className="flex-1 py-3 px-4 rounded-xl font-bold text-gray-600 bg-gray-50 hover:bg-gray-100 transition-colors"
+                disabled={deletingId}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={executeDelete}
+                disabled={deletingId}
+                className="flex-1 py-3 px-4 rounded-xl font-bold text-white bg-red-500 hover:bg-red-600 transition-colors flex justify-center items-center gap-2 shadow-lg shadow-red-500/30 disabled:opacity-70"
+              >
+                {deletingId ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Yes, Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

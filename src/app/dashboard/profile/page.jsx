@@ -30,6 +30,7 @@ export default function ProfilePage() {
   const [name, setName] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
 
@@ -57,6 +58,7 @@ export default function ProfilePage() {
         setError(updateError.message || 'Failed to update profile details.');
       } else {
         setSuccess('Your profile has been updated successfully!');
+        setIsEditing(false);
         // Keep success message for 4 seconds
         setTimeout(() => setSuccess(''), 4000);
       }
@@ -144,12 +146,13 @@ export default function ProfilePage() {
               <button
                 key={preset.name}
                 type="button"
+                disabled={!isEditing}
                 onClick={() => setImageUrl(preset.url)}
                 className={`group flex flex-col items-center p-2 rounded-xl border transition-all ${
                   imageUrl === preset.url 
                     ? 'border-[#E91E63] bg-[#FFF9FB] shadow-sm' 
                     : 'border-gray-100 hover:border-[#F8BBD0] hover:bg-gray-50'
-                }`}
+                } ${!isEditing ? 'opacity-70 cursor-not-allowed' : ''}`}
               >
                 <div className="w-12 h-12 rounded-lg overflow-hidden mb-1.5 border border-gray-100 shadow-sm group-hover:scale-105 transition-transform duration-200">
                   <img src={preset.url} alt={preset.name} className="w-full h-full object-cover" />
@@ -163,8 +166,9 @@ export default function ProfilePage() {
             <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-2">Avatar Seed API</span>
             <button
               type="button"
+              disabled={!isEditing}
               onClick={() => setImageUrl(`https://api.dicebear.com/7.x/adventurer/svg?seed=${name || 'VaultUser'}`)}
-              className="w-full text-center py-2 px-3 border border-dashed border-[#F8BBD0] text-xs font-medium text-[#E91E63] rounded-xl hover:bg-[#FFF9FB] transition-colors"
+              className="w-full text-center py-2 px-3 border border-dashed border-[#F8BBD0] text-xs font-medium text-[#E91E63] rounded-xl hover:bg-[#FFF9FB] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Generate Adventurer Avatar
             </button>
@@ -212,9 +216,10 @@ export default function ProfilePage() {
                   <input
                     type="text"
                     required
+                    disabled={!isEditing}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="block w-full pl-11 pr-4 py-3 bg-white border border-[#F8BBD0]/50 rounded-2xl text-[#1F2937] placeholder-[#9CA3AF] focus:ring-2 focus:ring-[#E91E63] focus:border-transparent transition-all shadow-sm"
+                    className="block w-full pl-11 pr-4 py-3 bg-white border border-[#F8BBD0]/50 rounded-2xl text-[#1F2937] placeholder-[#9CA3AF] focus:ring-2 focus:ring-[#E91E63] focus:border-transparent transition-all shadow-sm disabled:bg-gray-50 disabled:text-gray-500"
                     placeholder="Enter your name"
                   />
                 </div>
@@ -247,9 +252,10 @@ export default function ProfilePage() {
                 </div>
                 <input
                   type="url"
+                  disabled={!isEditing}
                   value={imageUrl}
                   onChange={(e) => setImageUrl(e.target.value)}
-                  className="block w-full pl-11 pr-4 py-3 bg-white border border-[#F8BBD0]/50 rounded-2xl text-[#1F2937] placeholder-[#9CA3AF] focus:ring-2 focus:ring-[#E91E63] focus:border-transparent transition-all shadow-sm text-sm"
+                  className="block w-full pl-11 pr-4 py-3 bg-white border border-[#F8BBD0]/50 rounded-2xl text-[#1F2937] placeholder-[#9CA3AF] focus:ring-2 focus:ring-[#E91E63] focus:border-transparent transition-all shadow-sm text-sm disabled:bg-gray-50 disabled:text-gray-500"
                   placeholder="https://example.com/avatar.jpg"
                 />
               </div>
@@ -257,24 +263,47 @@ export default function ProfilePage() {
             </div>
 
             {/* Actions */}
-            <div className="pt-4 border-t border-gray-100 flex justify-end">
-              <button
-                type="submit"
-                disabled={isUpdating}
-                className="btn-primary flex items-center gap-2 px-6 py-3 rounded-2xl font-semibold text-white bg-gradient-to-r from-[#E91E63] to-[#C2185B] shadow-md hover:shadow-lg transition-all disabled:opacity-50"
-              >
-                {isUpdating ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Saving Changes...
-                  </>
-                ) : (
-                  <>
-                    <Save className="w-5 h-5" />
-                    Save Changes
-                  </>
-                )}
-              </button>
+            <div className="pt-4 border-t border-gray-100 flex justify-end gap-3">
+              {!isEditing ? (
+                <button
+                  type="button"
+                  onClick={() => setIsEditing(true)}
+                  className="btn-primary flex items-center gap-2 px-6 py-3 rounded-2xl font-semibold text-white bg-gradient-to-r from-[#E91E63] to-[#C2185B] shadow-md hover:shadow-lg transition-all"
+                >
+                  Change Details
+                </button>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsEditing(false);
+                      setName(session?.user?.name || '');
+                      setImageUrl(session?.user?.image || '');
+                    }}
+                    className="flex items-center gap-2 px-6 py-3 rounded-2xl font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 transition-all"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isUpdating}
+                    className="btn-primary flex items-center gap-2 px-6 py-3 rounded-2xl font-semibold text-white bg-gradient-to-r from-[#E91E63] to-[#C2185B] shadow-md hover:shadow-lg transition-all disabled:opacity-50"
+                  >
+                    {isUpdating ? (
+                      <>
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        Saving...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="w-5 h-5" />
+                        Save Changes
+                      </>
+                    )}
+                  </button>
+                </>
+              )}
             </div>
           </form>
         </div>

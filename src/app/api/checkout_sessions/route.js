@@ -20,8 +20,7 @@ export async function POST(request) {
       price_data: {
         currency: 'usd',
         product_data: {
-          name: item.title || item.name,
-          images: item.image || item.productImage ? [item.image || item.productImage] : [],
+          name: item.title || item.name || 'Product',
           metadata: {
             productId: item._id
           }

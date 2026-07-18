@@ -13,7 +13,8 @@ import {
   User, 
   Home,
   Menu,
-  X
+  X,
+  Package
 } from 'lucide-react';
 import LogoutButton from '@/components/LogoutButton';
 
@@ -25,6 +26,7 @@ export default function DashboardSidebar() {
     { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Profile', href: '/dashboard/profile', icon: User },
     { name: 'Add Product', href: '/dashboard/add-product', icon: PlusCircle },
+    { name: 'My Products', href: '/dashboard/my-products', icon: Package },
     { name: 'My Wishlist', href: '/dashboard/my-wishlist', icon: Heart },
     { name: 'My Cart Items', href: '/dashboard/cart', icon: ShoppingBag },
   ];

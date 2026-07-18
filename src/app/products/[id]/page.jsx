@@ -125,8 +125,9 @@ export default function ProductDetailsPage({ params }) {
             <div className="relative aspect-square w-full rounded-3xl overflow-hidden bg-[#FFF9FB] border border-[#F8BBD0]/20 shadow-inner group">
               <img 
                 src={selectedImage || product.productImage || product.image || 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&q=80&w=600&h=600'} 
-                alt={product.productName || product.title || product.name} 
+                alt={product.productName || product.title || product.name || 'Product'} 
                 className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500"
+                onError={(e) => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&q=80&w=600&h=600' }}
               />
               {product.category && (
                 <span className="absolute top-4 left-4 bg-white/90 backdrop-blur-md text-[#E91E63] px-3.5 py-1.5 rounded-full text-xs font-bold shadow-sm uppercase tracking-wider">
@@ -147,7 +148,12 @@ export default function ProductDetailsPage({ params }) {
                       : 'border-transparent hover:border-[#F8BBD0]/60'
                   }`}
                 >
-                  <img src={imgUrl} alt="" className="w-full h-full object-cover" />
+                  <img 
+                    src={imgUrl} 
+                    alt="" 
+                    className="w-full h-full object-cover" 
+                    onError={(e) => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&q=80&w=600&h=600' }}
+                  />
                 </button>
               ))}
             </div>
