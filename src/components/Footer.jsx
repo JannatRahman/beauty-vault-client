@@ -2,9 +2,17 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Sparkles, MapPin, Phone, Mail } from 'lucide-react';
 
 export default function Footer() {
+  const pathname = usePathname();
+
+  // Don't render Footer on dashboard routes
+  if (pathname?.startsWith('/dashboard')) {
+    return null;
+  }
+
   return (
     <footer className="bg-[#1F2937] text-gray-300 pt-20 pb-10 border-t border-[#F8BBD0]/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

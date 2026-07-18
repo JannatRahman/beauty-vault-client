@@ -1,11 +1,1 @@
-import React from 'react';
-
-const ProductDetailsPage = () => {
-  return (
-    <div>
-      
-    </div>
-  );
-};
-
-export default ProductDetailsPage;
+// Deprecated in favor of page.jsx for Next.js App Router conventions

@@ -2,6 +2,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Playfair_Display, Inter } from "next/font/google";
+import { StoreProvider } from "@/providers/StoreProvider";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -37,11 +38,13 @@ export default function RootLayout({ children }) {
         className={`min-h-screen flex flex-col antialiased ${playfair.variable} ${inter.variable}`}
         style={{ background: '#FFF9FB', fontFamily: "var(--font-body), system-ui, sans-serif" }}
       >
-        <Navbar />
-        <main className="flex-1">
-          {children}
-        </main>
-        <Footer />
+        <StoreProvider>
+          <Navbar />
+          <main className="flex-1">
+            {children}
+          </main>
+          <Footer />
+        </StoreProvider>
       </body>
     </html>
   );

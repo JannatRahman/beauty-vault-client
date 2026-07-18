@@ -7,6 +7,7 @@ import { Search, Heart, ShoppingBag, Menu, X, Sparkles, User, LogOut } from 'luc
 import { authClient, useSession } from '@/lib/auth-client';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+import { useStore } from '@/providers/StoreProvider';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -15,6 +16,7 @@ export default function Navbar() {
   const router = useRouter();
   
   const { data: session } = useSession();
+  const { cart, wishlist } = useStore();
 
   const handleLogout = async () => {
     await authClient.signOut();
@@ -46,6 +48,11 @@ export default function Navbar() {
     }
     return () => { document.body.style.overflow = 'unset'; };
   }, [menuOpen]);
+
+  // Don't render Navbar on dashboard routes
+  if (pathname?.startsWith('/dashboard')) {
+    return null;
+  }
 
   return (
     <nav 
@@ -99,16 +106,22 @@ export default function Navbar() {
             <button className="hidden sm:flex items-center justify-center w-10 h-10 rounded-full bg-[#FFF9FB] text-[#4B5563] hover:bg-[#F8BBD0]/30 hover:text-[#E91E63] transition-colors shadow-sm">
               <Search className="w-5 h-5" />
             </button>
-            <button className="flex items-center justify-center w-10 h-10 rounded-full bg-[#FFF9FB] text-[#4B5563] hover:bg-[#F8BBD0]/30 hover:text-[#E91E63] transition-colors relative shadow-sm">
+
+            <Link href="/dashboard/my-wishlist" className="flex items-center justify-center w-10 h-10 rounded-full bg-[#FFF9FB] text-[#4B5563] hover:bg-[#F8BBD0]/30 hover:text-[#E91E63] transition-colors relative shadow-sm">
               <Heart className="w-5 h-5" />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-[#E91E63] rounded-full border-2 border-white" />
-            </button>
-            <button className="flex items-center justify-center w-10 h-10 rounded-full bg-[#FFF9FB] text-[#4B5563] hover:bg-[#F8BBD0]/30 hover:text-[#E91E63] transition-colors relative shadow-sm">
+              {wishlist.length > 0 && (
+                <span className="absolute top-2 right-2 w-2 h-2 bg-[#E91E63] rounded-full border-2 border-white animate-pulse" />
+              )}
+            </Link>
+
+            <Link href="/dashboard/cart" className="flex items-center justify-center w-10 h-10 rounded-full bg-[#FFF9FB] text-[#4B5563] hover:bg-[#F8BBD0]/30 hover:text-[#E91E63] transition-colors relative shadow-sm">
               <ShoppingBag className="w-5 h-5" />
-              <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#1F2937] text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">
-                3
-              </span>
-            </button>
+              {cart.length > 0 && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#1F2937] text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white animate-bounce-soft">
+                  {cart.reduce((total, item) => total + item.quantity, 0)}
+                </span>
+              )}
+            </Link>
 
             {/* Auth Button */}
             <div className="hidden md:block pl-4 border-l border-gray-200 ml-2">

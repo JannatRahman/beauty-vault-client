@@ -103,10 +103,10 @@ export default function FeaturedProducts() {
                 <div className="glass rounded-3xl p-4 group relative flex flex-col h-full card-hover bg-white border border-[#F8BBD0]/30 hover:border-[#F8BBD0]">
                   {/* Image Container */}
                   <div className="relative w-full aspect-square rounded-2xl overflow-hidden mb-4 bg-[#FFF9FB]">
-                    {product.image ? (
+                    {(product.productImage || product.image) ? (
                       <Image
-                        src={product.image}
-                        alt={product.title || product.name || 'Product'}
+                        src={product.productImage || product.image}
+                        alt={product.productName || product.title || product.name || 'Product'}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
@@ -117,13 +117,6 @@ export default function FeaturedProducts() {
                       </div>
                     )}
                     
-                    {/* Action Buttons Overlay */}
-                    <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 translate-x-2 group-hover:translate-x-0">
-                      <button className="w-9 h-9 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center text-[#1F2937] hover:text-[#E91E63] hover:bg-white shadow-sm transition-all">
-                        <Heart className="w-4.5 h-4.5" />
-                      </button>
-                    </div>
-
                     {/* Tag Overlay */}
                     {product.category && (
                       <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-full shadow-sm">
@@ -142,13 +135,13 @@ export default function FeaturedProducts() {
                       </p>
                       <div className="flex items-center gap-1">
                         <Star className="w-3.5 h-3.5 fill-[#FBBF24] text-[#FBBF24]" />
-                        <span className="text-xs font-medium text-[#1F2937]">4.8</span>
+                        <span className="text-xs font-medium text-[#1F2937]">{product.rating || '4.8'}</span>
                       </div>
                     </div>
                     
                     <Link href={`/products/${product._id}`} className="mb-2 group-hover:text-[#E91E63] transition-colors">
                       <h3 className="font-semibold text-[#1F2937] line-clamp-2 leading-tight">
-                        {product.title || product.name}
+                        {product.productName || product.title || product.name}
                       </h3>
                     </Link>
 

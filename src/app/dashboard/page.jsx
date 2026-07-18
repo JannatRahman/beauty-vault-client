@@ -1,32 +1,62 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Package, Heart, ShoppingBag, ArrowRight } from 'lucide-react';
+import { Package, Heart, ShoppingBag, ArrowRight, Loader2 } from 'lucide-react';
 import DashboardStatCard from './DashboardStatCard';
+import { useStore } from '@/providers/StoreProvider';
+import { useSession } from '@/lib/auth-client';
 
 export default function DashboardPage() {
+  const { cart, wishlist } = useStore();
+  const { data: session } = useSession();
+  
+  const [totalProducts, setTotalProducts] = useState(0);
+  const [loadingProducts, setLoadingProducts] = useState(true);
+
+  useEffect(() => {
+    const fetchUserProducts = async () => {
+      if (!session?.user?.id) {
+        setLoadingProducts(false);
+        return;
+      }
+      try {
+        const res = await fetch(`/api/products?createdBy=${session.user.id}`);
+        if (res.ok) {
+          const data = await res.json();
+          setTotalProducts(data.length);
+        }
+      } catch (error) {
+        console.error('Error fetching user products:', error);
+      } finally {
+        setLoadingProducts(false);
+      }
+    };
+    
+    fetchUserProducts();
+  }, [session]);
+
   const stats = [
     {
       title: 'Total Products Added',
-      value: '12',
+      value: loadingProducts ? '...' : totalProducts.toString(),
       icon: Package,
       colorClass: 'bg-[#E91E63]',
-      trend: { isUp: true, value: 8 }
+      trend: { isUp: true, value: totalProducts > 0 ? 100 : 0 }
     },
     {
       title: 'My Cart Items',
-      value: '3',
+      value: cart.length.toString(),
       icon: ShoppingBag,
       colorClass: 'bg-purple-500',
-      trend: { isUp: false, value: 2 }
+      trend: { isUp: cart.length > 0, value: cart.length > 0 ? 12 : 0 }
     },
     {
       title: 'Wishlist Items',
-      value: '24',
+      value: wishlist.length.toString(),
       icon: Heart,
       colorClass: 'bg-rose-500',
-      trend: { isUp: true, value: 12 }
+      trend: { isUp: wishlist.length > 0, value: wishlist.length > 0 ? 25 : 0 }
     }
   ];
 

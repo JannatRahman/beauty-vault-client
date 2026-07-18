@@ -1,15 +1,18 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from '@/lib/auth-client';
-import { Package, Image as ImageIcon, Tag, AlignLeft, Sparkles, Loader2, DollarSign, Star, Boxes, Ruler, Info } from 'lucide-react';
+import { Package, Image as ImageIcon, Tag, AlignLeft, Sparkles, Loader2, DollarSign, Star, Boxes, Ruler, ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
 
-export default function AddProductPage() {
+export default function EditProductPage({ params }) {
   const router = useRouter();
   const { data: session } = useSession();
+  const { id } = use(params);
 
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [error, setError] = useState('');
   
   const [formData, setFormData] = useState({
@@ -26,6 +29,49 @@ export default function AddProductPage() {
     ingredients: ''
   });
 
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const res = await fetch(`/api/single-product/${id}`);
+        if (!res.ok) throw new Error('Failed to fetch product');
+        const data = await res.json();
+        
+        // Ensure user is the creator
+        if (session?.user?.id && data.createdBy && data.createdBy !== session.user.id) {
+          setError('You are not authorized to edit this product.');
+          setInitialLoading(false);
+          return;
+        }
+
+        setFormData({
+          title: data.title || data.name || '',
+          brandName: data.brandName || data.brand || '',
+          category: data.category || '',
+          productImage: data.productImage || data.image || '',
+          price: data.price || '',
+          rating: data.rating || '',
+          stock: data.stock !== undefined ? data.stock : '',
+          size: data.size || '',
+          description: data.description || '',
+          usage: data.usage || '',
+          ingredients: data.ingredients || ''
+        });
+      } catch (err) {
+        console.error(err);
+        setError('Could not load product details.');
+      } finally {
+        setInitialLoading(false);
+      }
+    };
+
+    if (session?.user?.id) {
+      fetchProduct();
+    } else if (session === null) {
+        setInitialLoading(false);
+        setError('You must be logged in to edit a product.');
+    }
+  }, [id, session]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -35,11 +81,6 @@ export default function AddProductPage() {
     e.preventDefault();
     setError('');
     
-    if (!session?.user?.id) {
-      setError('You must be logged in to add a product.');
-      return;
-    }
-
     try {
       setLoading(true);
       
@@ -48,40 +89,59 @@ export default function AddProductPage() {
         price: parseFloat(formData.price) || 0,
         rating: parseFloat(formData.rating) || 0,
         stock: parseInt(formData.stock) || 0,
-        createdBy: session.user.id
       };
 
-      const res = await fetch('/api/upload-product', {
-        method: 'POST',
+      const res = await fetch(`/api/edit-product/${id}`, {
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
 
       if (!res.ok) {
-        throw new Error('Failed to add product');
+        throw new Error('Failed to update product');
       }
 
       router.push('/dashboard/my-products');
     } catch (err) {
       console.error(err);
-      setError('An error occurred while adding the product.');
+      setError('An error occurred while updating the product.');
     } finally {
       setLoading(false);
     }
   };
 
+  if (initialLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+        <Loader2 className="w-8 h-8 text-[#E91E63] animate-spin" />
+        <p className="text-gray-500 font-medium">Loading product details...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="glass rounded-[2rem] p-8 text-center max-w-lg mx-auto border border-red-100 space-y-4">
+        <h3 className="text-lg font-bold text-gray-800">Access Denied</h3>
+        <p className="text-gray-500 text-sm">{error}</p>
+        <Link href="/dashboard/my-products" className="btn-primary inline-flex justify-center py-2 px-6">
+           Back to My Products
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-4xl mx-auto pb-12">
-      <div className="mb-8">
-        <h1 className="text-3xl font-display font-extrabold text-[#1F2937]">Add New Product</h1>
-        <p className="text-gray-500 mt-2">Enrich the beauty vault with new exciting cosmetics and skincare items.</p>
-      </div>
-
-      {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-2xl text-red-600 font-medium text-sm">
-          {error}
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-display font-extrabold text-[#1F2937]">Edit Product</h1>
+          <p className="text-gray-500 mt-2">Update the details of your beauty vault item.</p>
         </div>
-      )}
+        <Link href="/dashboard/my-products" className="text-sm font-semibold text-gray-500 hover:text-[#E91E63] flex items-center gap-1">
+          <ArrowLeft className="w-4 h-4" /> Cancel
+        </Link>
+      </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">
         
@@ -102,7 +162,6 @@ export default function AddProductPage() {
                   value={formData.title}
                   onChange={handleChange}
                   className="w-full pl-4 pr-4 py-3 bg-[#FFF9FB] border border-[#F8BBD0]/40 rounded-xl focus:ring-2 focus:ring-[#E91E63] focus:border-transparent transition-all"
-                  placeholder="e.g. Luminous Silk Foundation"
                 />
               </div>
             </div>
@@ -117,7 +176,6 @@ export default function AddProductPage() {
                   value={formData.brandName}
                   onChange={handleChange}
                   className="w-full pl-4 pr-4 py-3 bg-[#FFF9FB] border border-[#F8BBD0]/40 rounded-xl focus:ring-2 focus:ring-[#E91E63] focus:border-transparent transition-all"
-                  placeholder="e.g. Giorgio Armani"
                 />
               </div>
             </div>
@@ -135,7 +193,6 @@ export default function AddProductPage() {
                   value={formData.category}
                   onChange={handleChange}
                   className="w-full pl-10 pr-4 py-3 bg-[#FFF9FB] border border-[#F8BBD0]/40 rounded-xl focus:ring-2 focus:ring-[#E91E63] focus:border-transparent transition-all"
-                  placeholder="e.g. Skincare, Makeup"
                 />
               </div>
             </div>
@@ -153,7 +210,6 @@ export default function AddProductPage() {
                   value={formData.productImage}
                   onChange={handleChange}
                   className="w-full pl-10 pr-4 py-3 bg-[#FFF9FB] border border-[#F8BBD0]/40 rounded-xl focus:ring-2 focus:ring-[#E91E63] focus:border-transparent transition-all"
-                  placeholder="https://example.com/image.jpg"
                 />
               </div>
             </div>
@@ -178,7 +234,6 @@ export default function AddProductPage() {
                 value={formData.price}
                 onChange={handleChange}
                 className="w-full px-4 py-3 bg-[#FFF9FB] border border-[#F8BBD0]/40 rounded-xl focus:ring-2 focus:ring-[#E91E63]"
-                placeholder="45.00"
               />
             </div>
 
@@ -197,7 +252,6 @@ export default function AddProductPage() {
                   value={formData.rating}
                   onChange={handleChange}
                   className="w-full pl-9 pr-4 py-3 bg-[#FFF9FB] border border-[#F8BBD0]/40 rounded-xl focus:ring-2 focus:ring-[#E91E63]"
-                  placeholder="4.8"
                 />
               </div>
             </div>
@@ -234,7 +288,6 @@ export default function AddProductPage() {
                   value={formData.size}
                   onChange={handleChange}
                   className="w-full pl-9 pr-4 py-3 bg-[#FFF9FB] border border-[#F8BBD0]/40 rounded-xl focus:ring-2 focus:ring-[#E91E63]"
-                  placeholder="50ml"
                 />
               </div>
             </div>
@@ -257,7 +310,6 @@ export default function AddProductPage() {
                 value={formData.description}
                 onChange={handleChange}
                 className="w-full p-4 bg-[#FFF9FB] border border-[#F8BBD0]/40 rounded-xl focus:ring-2 focus:ring-[#E91E63] focus:border-transparent transition-all resize-none"
-                placeholder="Detailed description of the product..."
               />
             </div>
 
@@ -270,7 +322,6 @@ export default function AddProductPage() {
                   value={formData.usage}
                   onChange={handleChange}
                   className="w-full p-4 bg-[#FFF9FB] border border-[#F8BBD0]/40 rounded-xl focus:ring-2 focus:ring-[#E91E63] resize-none"
-                  placeholder="How to use this product..."
                 />
               </div>
 
@@ -284,7 +335,6 @@ export default function AddProductPage() {
                   value={formData.ingredients}
                   onChange={handleChange}
                   className="w-full p-4 bg-[#FFF9FB] border border-[#F8BBD0]/40 rounded-xl focus:ring-2 focus:ring-[#E91E63] resize-none"
-                  placeholder="Key ingredients or highlights..."
                 />
               </div>
             </div>
@@ -299,11 +349,11 @@ export default function AddProductPage() {
           >
             {loading ? (
               <>
-                <Loader2 className="w-5 h-5 animate-spin" /> Adding to Vault...
+                <Loader2 className="w-5 h-5 animate-spin" /> Saving Changes...
               </>
             ) : (
               <>
-                <Package className="w-5 h-5" /> Publish Product
+                <Package className="w-5 h-5" /> Save Changes
               </>
             )}
           </button>
