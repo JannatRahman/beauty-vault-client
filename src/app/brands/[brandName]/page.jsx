@@ -47,7 +47,7 @@ export default function BrandProductsPage({ params }) {
       }
     };
     fetchBrandProducts();
-  }, [decodedBrandName]);
+  }, [decodedBrandName, trackBehavior]);
 
   const toggleWishlist = (product) => {
     const isInWishlist = wishlist.some((item) => item._id === product._id);
