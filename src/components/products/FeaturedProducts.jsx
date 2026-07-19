@@ -2,9 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Star, Heart, ShoppingBag } from 'lucide-react';
+import { Star, ShoppingBag } from 'lucide-react';
 
 export default function FeaturedProducts() {
   const [products, setProducts] = useState([]);
@@ -32,35 +31,56 @@ export default function FeaturedProducts() {
     hidden: { opacity: 0 },
     show: {
       opacity: 1,
-      transition: { staggerChildren: 0.1 }
+      transition: { staggerChildren: 0.09 }
     }
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } }
+    hidden: { opacity: 0, y: 24 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } }
   };
 
   return (
-    <section className="py-20 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-end mb-12">
+    <section className="py-24 relative overflow-hidden" style={{ background: '#0F0E17' }}>
+      {/* Background elements */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-px"
+          style={{ background: 'linear-gradient(90deg, transparent, rgba(201,169,110,0.25), transparent)' }}
+        />
+        <div
+          className="absolute -top-40 left-0 w-[400px] h-[400px] rounded-full"
+          style={{ background: 'radial-gradient(ellipse, rgba(201,169,110,0.06) 0%, transparent 70%)', filter: 'blur(60px)' }}
+        />
+        <div
+          className="absolute -bottom-40 right-0 w-[500px] h-[500px] rounded-full"
+          style={{ background: 'radial-gradient(ellipse, rgba(194,24,91,0.06) 0%, transparent 70%)', filter: 'blur(60px)' }}
+        />
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="flex justify-between items-end mb-14">
           <div className="max-w-2xl">
-            <motion.h2 
+            <div className="inline-flex items-center gap-2 border border-[#C9A96E]/30 text-[#C9A96E] text-xs font-semibold
+              px-5 py-2 rounded-full bg-[#C9A96E]/5 tracking-widest uppercase mb-5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#C9A96E] animate-pulse-soft" />
+              Community Favorites
+            </div>
+            <motion.h2
               initial={{ opacity: 0, y: -20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="font-display text-3xl md:text-4xl lg:text-5xl font-bold mb-4"
+              className="font-display text-3xl md:text-4xl lg:text-5xl font-bold mb-4 text-white"
             >
-              Trending <span className="gradient-text">Favorites</span>
+              Trending <span className="animate-gold-shimmer">Favorites</span>
             </motion.h2>
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-[#6B7280]"
+              className="text-white/40 font-light"
             >
               Shop our most sought-after products, loved by the BeautyVault community.
             </motion.p>
@@ -72,55 +92,62 @@ export default function FeaturedProducts() {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="hidden md:block"
           >
-            <Link href="/products" className="btn-outline text-sm">
+            <Link href="/products" className="btn-outline-gold text-sm">
               View All Products
             </Link>
           </motion.div>
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-7">
             {[...Array(8)].map((_, i) => (
-              <div key={i} className="glass rounded-3xl p-4 h-[400px] flex flex-col">
-                <div className="w-full h-48 skeleton rounded-2xl mb-4"></div>
-                <div className="w-2/3 h-4 skeleton rounded mb-2"></div>
-                <div className="w-full h-6 skeleton rounded mb-4"></div>
-                <div className="w-1/3 h-4 skeleton rounded mb-auto"></div>
-                <div className="w-full h-10 skeleton rounded-full mt-4"></div>
+              <div key={i} className="rounded-3xl p-4 h-[400px] flex flex-col animate-pulse"
+                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.05)' }}>
+                <div className="w-full h-48 rounded-2xl mb-4" style={{ background: 'rgba(255,255,255,0.06)' }} />
+                <div className="w-2/3 h-4 rounded mb-2" style={{ background: 'rgba(255,255,255,0.06)' }} />
+                <div className="w-full h-6 rounded mb-4" style={{ background: 'rgba(255,255,255,0.06)' }} />
+                <div className="w-1/3 h-4 rounded mb-auto" style={{ background: 'rgba(255,255,255,0.06)' }} />
+                <div className="w-full h-10 rounded-full mt-4" style={{ background: 'rgba(255,255,255,0.06)' }} />
               </div>
             ))}
           </div>
         ) : (
-          <motion.div 
+          <motion.div
             variants={containerVariants}
             initial="hidden"
             whileInView="show"
-            viewport={{ once: true, margin: "-100px" }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8"
+            viewport={{ once: true, margin: "-80px" }}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-7"
           >
             {products.map((product) => (
               <motion.div key={product._id} variants={itemVariants}>
-                <div className="glass rounded-3xl p-4 group relative flex flex-col h-full card-hover bg-white border border-[#F8BBD0]/30 hover:border-[#F8BBD0]">
+                <div
+                  className="rounded-3xl p-4 group relative flex flex-col h-full card-hover border border-white/5 hover:border-[#C9A96E]/20 transition-all duration-300"
+                  style={{ background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(20px)' }}
+                >
                   {/* Image Container */}
-                  <div className="relative w-full aspect-square rounded-2xl overflow-hidden mb-4 bg-[#FFF9FB]">
+                  <div className="relative w-full aspect-square rounded-2xl overflow-hidden mb-4"
+                    style={{ background: 'rgba(255,255,255,0.06)' }}>
                     {(product.productImage || product.image) ? (
-                      <Image
-                        src={product.productImage || product.image}
+                      <img
+                        src={product.productImage || product.image || 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=500'}
                         alt={product.productName || product.title || product.name || 'Product'}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        onError={(e) => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=500' }}
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-[#F8BBD0]">
+                      <div className="w-full h-full flex items-center justify-center text-white/20">
                         <ShoppingBag size={48} />
                       </div>
                     )}
-                    
-                    {/* Tag Overlay */}
+
+                    {/* Category tag */}
                     {product.category && (
-                      <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-full shadow-sm">
-                        <span className="text-[10px] font-semibold text-[#E91E63] uppercase tracking-wider">
+                      <div
+                        className="absolute top-3 left-3 backdrop-blur-md px-2.5 py-1 rounded-full"
+                        style={{ background: 'rgba(15,14,23,0.75)', border: '1px solid rgba(201,169,110,0.25)' }}
+                      >
+                        <span className="text-[10px] font-semibold text-[#C9A96E] uppercase tracking-wider">
                           {product.category}
                         </span>
                       </div>
@@ -130,27 +157,38 @@ export default function FeaturedProducts() {
                   {/* Product Info */}
                   <div className="flex flex-col flex-grow">
                     <div className="flex justify-between items-start mb-1">
-                      <p className="text-xs text-[#6B7280] font-medium uppercase tracking-wider">
+                      <p className="text-xs text-white/35 font-medium uppercase tracking-wider">
                         {product.brandName || product.brand || 'BeautyVault'}
                       </p>
                       <div className="flex items-center gap-1">
-                        <Star className="w-3.5 h-3.5 fill-[#FBBF24] text-[#FBBF24]" />
-                        <span className="text-xs font-medium text-[#1F2937]">{product.rating || '4.8'}</span>
+                        <Star className="w-3.5 h-3.5 fill-[#C9A96E] text-[#C9A96E]" />
+                        <span className="text-xs font-medium text-white/55">{product.rating || '4.8'}</span>
                       </div>
                     </div>
-                    
-                    <Link href={`/products/${product._id}`} className="mb-2 group-hover:text-[#E91E63] transition-colors">
-                      <h3 className="font-semibold text-[#1F2937] line-clamp-2 leading-tight">
+
+                    <Link href={`/products/${product._id}`} className="mb-2">
+                      <h3 className="font-semibold text-white/85 group-hover:text-[#C9A96E] transition-colors line-clamp-2 leading-tight">
                         {product.productName || product.title || product.name}
                       </h3>
                     </Link>
 
-                    <div className="mt-auto pt-4 flex items-center justify-between">
-                      <p className="font-bold text-lg text-[#1F2937]">
+                    <div className="mt-auto pt-4 flex items-center justify-between border-t border-white/6">
+                      <p className="font-bold text-lg text-white">
                         ${product.price}
                       </p>
-                      <button className="w-9 h-9 bg-[#FFF9FB] rounded-full flex items-center justify-center text-[#E91E63] hover:bg-[#E91E63] hover:text-white transition-colors duration-300">
-                        <ShoppingBag className="w-4.5 h-4.5" />
+                      <button
+                        className="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 text-[#C9A96E] hover:text-[#1A1825]"
+                        style={{ background: 'rgba(201,169,110,0.12)', border: '1px solid rgba(201,169,110,0.2)' }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = 'linear-gradient(135deg, #C9A96E, #B8935A)';
+                          e.currentTarget.style.borderColor = 'transparent';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = 'rgba(201,169,110,0.12)';
+                          e.currentTarget.style.borderColor = 'rgba(201,169,110,0.2)';
+                        }}
+                      >
+                        <ShoppingBag className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
@@ -161,7 +199,7 @@ export default function FeaturedProducts() {
         )}
 
         <div className="mt-10 text-center md:hidden">
-          <Link href="/products" className="btn-outline w-full justify-center">
+          <Link href="/products" className="btn-outline-gold w-full justify-center">
             View All Products
           </Link>
         </div>

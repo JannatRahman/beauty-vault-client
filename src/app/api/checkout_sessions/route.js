@@ -10,7 +10,7 @@ export async function POST(request) {
     const origin = headersList.get('origin')
     
     const body = await request.json();
-    const { cart } = body;
+    const { cart, email } = body;
 
     if (!cart || cart.length === 0) {
       return NextResponse.json({ error: 'Cart is empty' }, { status: 400 });
@@ -31,6 +31,7 @@ export async function POST(request) {
     }));
 
     const session = await stripe.checkout.sessions.create({
+      customer_email: email || undefined,
       line_items,
       mode: 'payment',
       success_url: `${origin}/cart/success?session_id={CHECKOUT_SESSION_ID}`,

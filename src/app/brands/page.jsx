@@ -7,6 +7,24 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const ITEMS_PER_PAGE = 8;
 
+const fallbackImages = [
+  'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e',
+  'https://images.unsplash.com/photo-1596462502278-27bfdc403348',
+  'https://images.unsplash.com/photo-1512496015851-a1cbf39db79a',
+  'https://images.unsplash.com/photo-1617897903246-719242758050',
+  'https://images.unsplash.com/photo-1556228578-0d85b1a4d571',
+  'https://images.unsplash.com/photo-1571781926291-c477eb31f822',
+  'https://images.unsplash.com/photo-1580870059800-410a56209bb4',
+  'https://images.unsplash.com/photo-1620916566398-39f1143ab7be',
+  'https://images.unsplash.com/photo-1599305090598-fe179d501227',
+];
+
+const getFallbackImage = (brandName, index) => {
+  const hash = brandName ? brandName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) : index;
+  const img = fallbackImages[hash % fallbackImages.length];
+  return `${img}?auto=format&fit=crop&q=80&w=200&h=200`;
+};
+
 export default function BrandsPage() {
   const [brands, setBrands] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -111,7 +129,9 @@ export default function BrandsPage() {
             {/* Grid */}
             <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               <AnimatePresence mode="popLayout">
-                {paginatedBrands.map((brand, idx) => (
+                {paginatedBrands.map((brand, idx) => {
+                  const fallbackSrc = getFallbackImage(brand.brandName, idx);
+                  return (
                   <motion.div
                     key={brand.brandName || idx}
                     layout
@@ -122,16 +142,12 @@ export default function BrandsPage() {
                     className="glass rounded-3xl p-5 flex flex-col h-full card-hover bg-white border border-[#F8BBD0]/30 hover:border-[#F8BBD0] group text-center"
                   >
                     <div className="w-24 h-24 mx-auto bg-gray-50 rounded-full border-4 border-[#FFF9FB] shadow-sm mb-4 overflow-hidden relative group-hover:shadow-md transition-shadow flex items-center justify-center">
-                      {brand.brandLogo ? (
-                        <img 
-                          src={brand.brandLogo} 
-                          alt={brand.brandName} 
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
-                          onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1522337788-75e7a9f7e8ba?auto=format&fit=crop&q=80&w=200&h=200'; }}
-                        />
-                      ) : (
-                        <span className="text-3xl font-bold text-gray-300">{brand.brandName?.charAt(0)}</span>
-                      )}
+                      <img 
+                        src={brand.brandLogo || fallbackSrc} 
+                        alt={brand.brandName} 
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+                        onError={(e) => { e.target.onerror = null; e.target.src = fallbackSrc; }}
+                      />
                     </div>
                     
                     <h3 className="font-bold text-lg text-[#1F2937] mb-1 line-clamp-1">
@@ -150,7 +166,7 @@ export default function BrandsPage() {
                       </Link>
                     </div>
                   </motion.div>
-                ))}
+                )})}
               </AnimatePresence>
             </motion.div>
 

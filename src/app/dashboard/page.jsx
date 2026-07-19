@@ -6,6 +6,7 @@ import { Package, Heart, ShoppingBag, ArrowRight, Loader2 } from 'lucide-react';
 import DashboardStatCard from './DashboardStatCard';
 import { useStore } from '@/providers/StoreProvider';
 import { useSession } from '@/lib/auth-client';
+import BeautyTalks from '@/components/BeautyTalks';
 
 export default function DashboardPage() {
   const { cart, wishlist } = useStore();
@@ -67,6 +68,11 @@ export default function DashboardPage() {
         {stats.map((stat, idx) => (
           <DashboardStatCard key={idx} {...stat} />
         ))}
+      </div>
+
+      {/* BeautyTalks AI Recommendation Section */}
+      <div className="mb-10">
+        <BeautyTalks />
       </div>
 
       {/* Quick Actions & Recent Activity */}

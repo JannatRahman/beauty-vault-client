@@ -4,6 +4,7 @@ import WhyChooseBeautyVault from "@/components/WhyChooseBeautyVault";
 import FeaturedProducts from "@/components/products/FeaturedProducts";
 import CustomerReview from "@/components/CustomerReview";
 import Newsletter from "@/components/Newsletter";
+import BeautyTalks from "@/components/BeautyTalks";
 
 export const metadata = {
   title: "Home",
@@ -18,6 +19,7 @@ export default function Home() {
       <FeaturedBrands />
       <WhyChooseBeautyVault />
       <FeaturedProducts />
+      <BeautyTalks />
       <CustomerReview />
       <Newsletter />
     </>

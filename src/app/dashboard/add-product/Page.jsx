@@ -3,11 +3,13 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from '@/lib/auth-client';
+import { useStore } from '@/providers/StoreProvider';
 import { Package, Image as ImageIcon, Tag, AlignLeft, Sparkles, Loader2, DollarSign, Star, Boxes, Ruler, Info } from 'lucide-react';
 
 export default function AddProductPage() {
   const router = useRouter();
   const { data: session } = useSession();
+  const { showToast } = useStore();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -61,10 +63,12 @@ export default function AddProductPage() {
         throw new Error('Failed to add product');
       }
 
+      showToast('Product added successfully!', 'success');
       router.push('/dashboard/my-products');
     } catch (err) {
       console.error(err);
       setError('An error occurred while adding the product.');
+      showToast('Failed to add product.', 'error');
     } finally {
       setLoading(false);
     }

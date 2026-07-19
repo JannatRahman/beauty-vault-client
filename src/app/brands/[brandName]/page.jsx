@@ -18,7 +18,7 @@ export default function BrandProductsPage({ params }) {
   const { brandName } = use(params);
   const decodedBrandName = decodeURIComponent(brandName);
   
-  const { cart, wishlist, addToCart, addToWishlist, removeFromWishlist } = useStore();
+  const { cart, wishlist, addToCart, addToWishlist, removeFromWishlist, trackBehavior } = useStore();
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -34,10 +34,11 @@ export default function BrandProductsPage({ params }) {
         
         // Filter products by brandName on the client since API doesn't have a specific brand endpoint
         const filtered = data.filter(p => 
-          (p.brandName || p.brand)?.toLowerCase() === decodedBrandName.toLowerCase()
+          (p.brandName || p.brand)?.toLowerCase().replace(/-/g, ' ') === decodedBrandName.toLowerCase().replace(/-/g, ' ')
         );
         
         setProducts(filtered);
+        trackBehavior('view_brand', { brand: decodedBrandName });
       } catch (err) {
         console.error('Error fetching brand products:', err);
         setError('Unable to load products for this brand.');

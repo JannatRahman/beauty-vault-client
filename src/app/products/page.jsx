@@ -259,10 +259,11 @@ export default function ProductsPage() {
                           <div className="relative w-full aspect-square rounded-2xl overflow-hidden mb-4 bg-[#FFF9FB]">
                             {product.productImage || product.image ? (
                               <img 
-                                src={product.productImage || product.image} 
+                                src={product.productImage || product.image || 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&q=80&w=300&h=300'} 
                                 alt={product.productName || product.title || product.name} 
                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                 onError={(e) => {
+                                  e.target.onerror = null;
                                   e.target.src = 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&q=80&w=300&h=300';
                                 }}
                               />

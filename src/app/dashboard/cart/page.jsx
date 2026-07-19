@@ -11,9 +11,11 @@ import {
   ShoppingBag as CartIcon
 } from 'lucide-react';
 import { useStore } from '@/providers/StoreProvider';
+import { useSession } from '@/lib/auth-client';
 
 export default function CartPage() {
-  const { cart, removeFromCart, updateCartQuantity, clearCart } = useStore();
+  const { cart, removeFromCart, updateCartQuantity, clearCart, showToast } = useStore();
+  const { data: session } = useSession();
 
   const subtotal = cart.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0);
   const tax = subtotal * 0.08; // 8% sales tax
@@ -62,9 +64,10 @@ export default function CartPage() {
                   {/* Image */}
                   <div className="w-24 h-24 rounded-2xl overflow-hidden bg-[#FFF9FB] border border-gray-100 flex-shrink-0">
                     <img 
-                      src={item.image || 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&q=80&w=150&h=150'} 
+                      src={item.image || item.productImage || 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&q=80&w=150&h=150'} 
                       alt={item.title || item.name} 
                       className="w-full h-full object-cover"
+                      onError={(e) => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&q=80&w=150&h=150'; }}
                     />
                   </div>
 
@@ -167,14 +170,14 @@ export default function CartPage() {
                   const res = await fetch('/api/checkout_sessions', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ cart })
+                    body: JSON.stringify({ cart, email: session?.user?.email })
                   });
                   if (!res.ok) throw new Error('Checkout failed');
                   const { url } = await res.json();
                   window.location.href = url;
                 } catch (err) {
                   console.error(err);
-                  alert('Error during checkout.');
+                  showToast('Error during checkout.', 'error');
                 }
               }}
               className="w-full btn-primary py-4 px-6 rounded-2xl shadow-lg flex items-center justify-center gap-2 font-bold bg-gradient-to-r from-[#E91E63] to-[#C2185B] text-white"

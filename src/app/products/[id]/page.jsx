@@ -22,7 +22,7 @@ import { useStore } from '@/providers/StoreProvider';
 export default function ProductDetailsPage({ params }) {
   const { id } = use(params);
   const router = useRouter();
-  const { cart, wishlist, addToCart, addToWishlist, removeFromWishlist } = useStore();
+  const { cart, wishlist, addToCart, addToWishlist, removeFromWishlist, trackBehavior } = useStore();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -42,6 +42,13 @@ export default function ProductDetailsPage({ params }) {
         const data = await res.json();
         setProduct(data);
         setSelectedImage(data.productImage || data.image || '');
+        
+        // Track behavior
+        if (data) {
+          trackBehavior('view_product', { id: data._id });
+          if (data.category) trackBehavior('view_category', { category: data.category });
+          if (data.brandName || data.brand) trackBehavior('view_brand', { brand: data.brandName || data.brand });
+        }
       } catch (err) {
         console.error('Error loading product details:', err);
         setError('Could not retrieve product information.');
@@ -50,6 +57,7 @@ export default function ProductDetailsPage({ params }) {
       }
     };
     if (id) fetchProduct();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   if (loading) {
@@ -125,7 +133,7 @@ export default function ProductDetailsPage({ params }) {
             <div className="relative aspect-square w-full rounded-3xl overflow-hidden bg-[#FFF9FB] border border-[#F8BBD0]/20 shadow-inner group">
               <img 
                 src={selectedImage || product.productImage || product.image || 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&q=80&w=600&h=600'} 
-                alt={product.productName || product.title || product.name || 'Product'} 
+                alt={product.productName || product.title}
                 className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500"
                 onError={(e) => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&q=80&w=600&h=600' }}
               />
