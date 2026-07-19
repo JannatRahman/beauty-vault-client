@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background -->
+  <rect width="512" height="512" rx="120" fill="#FFF9FB"/>
+  
+  <!-- Lipstick Base -->
+  <rect x="206" y="270" width="100" height="140" rx="12" fill="#C2185B"/>
+  <!-- Base Highlights -->
+  <rect x="216" y="270" width="10" height="140" fill="#E91E63"/>
+  <rect x="286" y="270" width="10" height="140" fill="#880E4F"/>
+
+  <!-- Metal Ring -->
+  <rect x="216" y="235" width="80" height="35" fill="#F8BBD0"/>
+  <rect x="226" y="235" width="5" height="35" fill="#FFFFFF" opacity="0.6"/>
+
+  <!-- Lipstick Color -->
+  <path d="M226 235 V160 C226 120 286 100 286 160 V235 Z" fill="#E91E63"/>
+  
+  <!-- Lipstick Highlights -->
+  <path d="M236 235 V155 C236 135 246 135 246 155 V235 Z" fill="#F48FB1"/>
+</svg>

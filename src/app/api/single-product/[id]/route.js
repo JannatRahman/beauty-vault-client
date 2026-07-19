@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const client = await clientPromise;
     const db = client.db(process.env.MONGODB_DB);
 

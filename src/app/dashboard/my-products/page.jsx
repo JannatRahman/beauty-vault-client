@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSession } from '@/lib/auth-client';
+import toast from 'react-hot-toast';
 import { Package, Search, Edit2, Trash2, Loader2, AlertCircle, Plus, Eye, Star } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -63,9 +64,10 @@ export default function MyProductsPage() {
       setProducts(prev => prev.filter(p => p._id !== productToDelete._id));
       setDeleteModalOpen(false);
       setProductToDelete(null);
+      toast.success('Product deleted successfully');
     } catch (err) {
       console.error(err);
-      alert('Failed to delete product.');
+      toast.error('Failed to delete product.');
     } finally {
       setDeletingId(null);
     }

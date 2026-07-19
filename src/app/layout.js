@@ -4,6 +4,7 @@ import Footer from "@/components/Footer";
 import { Playfair_Display, Inter } from "next/font/google";
 import { StoreProvider } from "@/providers/StoreProvider";
 import BeautyVaultAIChat from "@/components/ai/BeautyVaultAIChat";
+import { Toaster } from "react-hot-toast";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -46,6 +47,7 @@ export default function RootLayout({ children }) {
           </main>
           <BeautyVaultAIChat />
           <Footer />
+          <Toaster position="bottom-right" />
         </StoreProvider>
       </body>
     </html>

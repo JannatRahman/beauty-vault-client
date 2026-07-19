@@ -4,7 +4,7 @@ import { auth } from '@/lib/auth';
 import clientPromise from '@/lib/db';
 import { ObjectId } from 'mongodb';
 
-export async function DELETE(request, { params }) {
+export async function PATCH(request, { params }) {
   try {
     const session = await auth.api.getSession({
       headers: await headers()
@@ -15,23 +15,26 @@ export async function DELETE(request, { params }) {
     }
 
     const { id } = await params;
+    const updateProduct = await request.json();
 
     if (!id || !ObjectId.isValid(id)) {
       return NextResponse.json({ error: 'Invalid product ID' }, { status: 400 });
     }
 
+    // prevent modifying _id
+    delete updateProduct._id;
+
     const client = await clientPromise;
     const db = client.db(process.env.MONGODB_DB);
 
-    const result = await db.collection('products').deleteOne({ _id: new ObjectId(id) });
+    const result = await db.collection('products').updateOne(
+      { _id: new ObjectId(id) },
+      { $set: updateProduct }
+    );
 
-    if (result.deletedCount === 0) {
-      return NextResponse.json({ error: 'Product not found' }, { status: 404 });
-    }
-
-    return NextResponse.json({ success: true }, { status: 200 });
+    return NextResponse.json(result, { status: 200 });
   } catch (error) {
-    console.error('Error deleting product:', error);
+    console.error('Error editing product:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

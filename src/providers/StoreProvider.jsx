@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 const StoreContext = createContext();
 
@@ -17,7 +17,7 @@ export function StoreProvider({ children }) {
     }, 3000);
   };
 
-  const trackBehavior = async (action, payload) => {
+  const trackBehavior = useCallback(async (action, payload) => {
     try {
       await fetch('/api/user/behavior', {
         method: 'POST',
@@ -27,7 +27,7 @@ export function StoreProvider({ children }) {
     } catch (e) {
       console.error('Error tracking behavior:', e);
     }
-  };
+  }, []);
 
   // Load initial state
   useEffect(() => {
